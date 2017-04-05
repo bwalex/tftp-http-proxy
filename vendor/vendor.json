@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "HFT0JpXvVHrb2XJjIXA6jKRaihQ=",
+			"path": "github.com/pin/tftp",
+			"revision": "9ea92f6b1029bc1bf3072bba195c84bb9b0370e3",
+			"revisionTime": "2016-08-25T18:38:18Z"
+		},
+		{
+			"checksumSHA1": "HlAlkC1SX2DuDFWTGCf321tbsYg=",
+			"path": "github.com/pin/tftp/netascii",
+			"revision": "9ea92f6b1029bc1bf3072bba195c84bb9b0370e3",
+			"revisionTime": "2016-08-25T18:38:18Z"
+		}
+	],
+	"rootPath": "github.com/bwalex/tftp-http-proxy"
+}
