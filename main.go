@@ -6,24 +6,19 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"net/url"
-	"path"
 	"time"
 	"github.com/pin/tftp"
 )
 
 const httpBaseUrlDefault = "http://127.0.0.1/tftp"
 const tftpTimeoutDefault = 5 * time.Second
-const appendPathDefault = true
 
 var globalState = struct {
 	httpBaseUrl	string
 	httpClient	*http.Client
-	appendPath	bool
 }{
 	httpBaseUrl:	httpBaseUrlDefault,
 	httpClient:	nil,
-	appendPath:	appendPathDefault,
 }
 
 func tftpReadHandler(filename string, rf io.ReaderFrom) error {
@@ -32,9 +27,6 @@ func tftpReadHandler(filename string, rf io.ReaderFrom) error {
 	log.Printf("INFO: New TFTP request (%s) from %s", filename, raddr.IP.String())
 
 	uri := globalState.httpBaseUrl
-	if globalState.appendPath {
-		uri = path.Join(uri, url.PathEscape(filename))
-	}
 
 	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
@@ -77,13 +69,11 @@ func tftpReadHandler(filename string, rf io.ReaderFrom) error {
 func main() {
 	httpBaseUrlPtr := flag.String("http-base-url", httpBaseUrlDefault, "HTTP base URL")
 	tftpTimeoutPtr := flag.Duration("tftp-timeout", tftpTimeoutDefault, "TFTP timeout")
-	appendPathPtr := flag.Bool("http-append-path", appendPathDefault, "append TFTP filename to URL")
 
 	flag.Parse()
 
 	globalState.httpBaseUrl = *httpBaseUrlPtr
 	globalState.httpClient = &http.Client{}
-	globalState.appendPath = *appendPathPtr
 
 	s := tftp.NewServer(tftpReadHandler, nil)
 	s.SetTimeout(*tftpTimeoutPtr)
