@@ -29,3 +29,7 @@ When tftp-http-proxy is started, it will listen on (UDP) port 69 as a normal TFT
 If the HTTP request returns a status 200 response, the contents of the response will be sent as the file contents for the TFTP read request. The HTTP response should contain an accurate ContentLength header, as it will be used to set the TFTP TSize option on the read response.
 
 If the HTTP response status is not 200, an error response will be sent to the TFTP client instead.
+
+## License
+
+tftp-http-proxy is released under the [MIT License](http://www.opensource.org/licenses/MIT).
