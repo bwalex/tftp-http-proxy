@@ -8,6 +8,8 @@ tftp-http-proxy is a simple TFTP server that proxies all read requests to a back
 
 Release binaries for linux amd64 platforms are built by default and can be downloaded from the [Releases page](https://github.com/bwalex/tftp-http-proxy/releases).
 
+For other platforms or to build from source, clone the repository and just run `make`.
+
 ## Usage
 
     Usage of dist/tftp-http-proxy:
