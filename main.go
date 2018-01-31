@@ -12,6 +12,7 @@ import (
 
 const httpBaseUrlDefault = "http://127.0.0.1/tftp"
 const tftpTimeoutDefault = 5 * time.Second
+const tftpBindAddrDefault = ":69"
 
 var globalState = struct {
 	httpBaseUrl	string
@@ -69,6 +70,7 @@ func tftpReadHandler(filename string, rf io.ReaderFrom) error {
 func main() {
 	httpBaseUrlPtr := flag.String("http-base-url", httpBaseUrlDefault, "HTTP base URL")
 	tftpTimeoutPtr := flag.Duration("tftp-timeout", tftpTimeoutDefault, "TFTP timeout")
+	bindAddrPtr := flag.String("tftp-bind-address", tftpBindAddrDefault, "TFTP addr to bind to")
 
 	flag.Parse()
 
@@ -77,8 +79,9 @@ func main() {
 
 	s := tftp.NewServer(tftpReadHandler, nil)
 	s.SetTimeout(*tftpTimeoutPtr)
-	err := s.ListenAndServe(":69")
+	log.Printf("Listening TFTP requests on: %s", *bindAddrPtr)
+	err := s.ListenAndServe(*bindAddrPtr)
 	if err != nil {
-		log.Fatalf("FATAL: tftp server: %v\n", err)
+		log.Panicf("FATAL: tftp server: %v\n", err)
 	}
 }
