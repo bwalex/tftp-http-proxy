@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 	"github.com/pin/tftp"
 )
@@ -13,13 +15,35 @@ import (
 const httpBaseUrlDefault = "http://127.0.0.1/tftp"
 const tftpTimeoutDefault = 5 * time.Second
 const tftpBindAddrDefault = ":69"
+const appendPathDefault = false
 
 var globalState = struct {
 	httpBaseUrl	string
 	httpClient	*http.Client
+	appendPath	bool
 }{
 	httpBaseUrl:	httpBaseUrlDefault,
 	httpClient:	nil,
+	appendPath:	appendPathDefault,
+}
+
+func urlJoin(base string, other string) (string, error) {
+	if !strings.HasSuffix(base, "/") {
+		base = base + "/"
+	}
+
+	b, err := url.Parse(base)
+	if err != nil {
+		return "", err
+	}
+
+	o, err := url.Parse(strings.TrimPrefix(other, "/"))
+	if err != nil {
+		return "", err
+	}
+
+	u := b.ResolveReference(o)
+	return u.String(), nil
 }
 
 func tftpReadHandler(filename string, rf io.ReaderFrom) error {
@@ -28,6 +52,14 @@ func tftpReadHandler(filename string, rf io.ReaderFrom) error {
 	log.Printf("INFO: New TFTP request (%s) from %s", filename, raddr.IP.String())
 
 	uri := globalState.httpBaseUrl
+	if globalState.appendPath {
+		var err error
+		uri, err = urlJoin(uri, filename)
+		if err != nil {
+			log.Printf("ERR: error building URL: %v", err)
+			return err
+		}
+	}
 
 	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
@@ -69,6 +101,7 @@ func tftpReadHandler(filename string, rf io.ReaderFrom) error {
 
 func main() {
 	httpBaseUrlPtr := flag.String("http-base-url", httpBaseUrlDefault, "HTTP base URL")
+	appendPathPtr := flag.Bool("http-append-path", appendPathDefault, "append TFTP filename to URL")
 	tftpTimeoutPtr := flag.Duration("tftp-timeout", tftpTimeoutDefault, "TFTP timeout")
 	bindAddrPtr := flag.String("tftp-bind-address", tftpBindAddrDefault, "TFTP addr to bind to")
 
@@ -76,6 +109,7 @@ func main() {
 
 	globalState.httpBaseUrl = *httpBaseUrlPtr
 	globalState.httpClient = &http.Client{}
+	globalState.appendPath = *appendPathPtr
 
 	s := tftp.NewServer(tftpReadHandler, nil)
 	s.SetTimeout(*tftpTimeoutPtr)
