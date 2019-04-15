@@ -14,9 +14,15 @@ For other platforms or to build from source, clone the repository and just run `
 
     Usage of dist/tftp-http-proxy:
       -http-base-url string
-        	HTTP base URL (default "http://127.0.0.1/tftp")
+                HTTP base URL (default "http://127.0.0.1/tftp")
+      -http-append-path
+                Append path to url (add slash and then requested path), warning
+                no path sanitization is done, so it may contain /../ or other
+                wild characters.
       -tftp-timeout duration
-        	TFTP timeout (default 5s)
+                TFTP timeout (default 5s)
+      -tftp-bind-address address
+                UDP address to bind to
 
 ## Details
 
